@@ -1,17 +1,41 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import React, { Component } from "react";
+import ReactDOM from "react-dom";
+import { Route, Switch, BrowserRouter } from "react-router-dom";
+import { Provider, connect } from "react-redux";
+import todos from "./components/todos";
+import userTodo from "./reducers";
+import { createStore, applyMiddleware, compose } from "redux";
+import thunk from "redux-thunk";
+import "./styles.css";
+import "antd/dist/antd.css";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+const store = createStore(userTodo, composeEnhancer(applyMiddleware(thunk)));
+
+class RootContainerComponent extends Component {
+  render() {
+    return (
+      <BrowserRouter>
+        <Switch>
+          <Route exact path="/" component={todos} />
+        </Switch>
+      </BrowserRouter>
+    );
+  }
+}
+
+let RootContainer = connect()(RootContainerComponent);
+
+export default class App extends Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <RootContainer />
+      </Provider>
+    );
+  }
+}
+
+const rootElement = document.getElementById("root");
+ReactDOM.render(<App />, rootElement);
